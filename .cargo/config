@@ -1,0 +1,8 @@
+
+# 指定默认编译目标
+[build]
+target = "x86_64-lin_os.json"
+
+
+[target.'cfg(target_os = "none")']
+runner = "bootimage runner"

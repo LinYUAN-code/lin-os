@@ -1,0 +1,29 @@
+
+[package]
+name = "lin_os"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# bootloader 别人实现好的一个BIOS引导程序
+bootloader = "0.9.20"
+volatile = "0.2.6"
+spin = "0.5.2"
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["spin_no_std"]
+
+# 禁用栈展开
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
+
+# 令bootimage使用xbuild进行编译
+[package.metadata.bootimage]
+build-command = ["xbuild"]
