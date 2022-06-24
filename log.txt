@@ -1,0 +1,4 @@
+Running 1 tests
+basic_boot::test_println...	[ok]
+many...	[ok]
+lin_os::vga_buffer::test_println_ouput...	[ok]

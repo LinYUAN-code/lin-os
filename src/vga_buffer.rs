@@ -4,6 +4,7 @@ use spin::Mutex;
 use core::fmt;
 
 
+
 // println! Macro 
 #[macro_export]
 macro_rules! print {
@@ -19,7 +20,12 @@ macro_rules! println {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    WRITER.lock().write_fmt(args).unwrap();
+    use x86_64::instructions::interrupts;
+
+    // 在函数执行前进行sti 禁止中断--避免死锁的发生
+    interrupts::without_interrupts(|| {
+        WRITER.lock().write_fmt(args).unwrap();
+    });
 }
 
 // rust的全局变量的值和c++一样都是在编译的时候计算出来的--。--然后rust编译对这方面的支持又很差
@@ -161,3 +167,26 @@ impl Writer {
 
 //     writer.write_string("hello world!");
 // }
+
+#[test_case]
+fn test_println_many() {
+    for _ in 0..200 {
+        println!("hello world from lrj");
+    }
+}
+
+#[test_case]
+fn test_println_ouput() {
+    let s = "hello world from lrj";
+    use x86_64::instructions::interrupts;
+    use core::fmt::Write;
+    interrupts::without_interrupts(|| {
+        // 需要独占锁
+        let mut writer = WRITER.lock();
+        writeln!(writer,"\n{}",s).expect("writen failed");
+        for (i,c) in s.chars().enumerate() {
+            let screen_char = writer.buffer.chars[BUFFER_HEIGHT-2][i].read();
+            assert_eq!(char::from(screen_char.ascii_character),c);
+        }
+    });
+}

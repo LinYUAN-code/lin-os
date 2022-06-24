@@ -15,3 +15,4 @@ https://qemu.weilnetz.de/w64/2015/qemu-w64-setup-20150115.exe
 
 cargo xrun
 
+cargo xtest
